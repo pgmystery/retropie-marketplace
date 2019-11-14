@@ -1,0 +1,96 @@
+Metadata-Version: 2.1
+Name: virtualenv
+Version: 16.1.0
+Summary: Virtual Python Environment builder
+Home-page: https://virtualenv.pypa.io/
+Author: Ian Bicking
+Author-email: ianb@colorstudy.com
+Maintainer: Jannis Leidel, Carl Meyer and Brian Rosner
+Maintainer-email: python-virtualenv@groups.google.com
+License: MIT
+Keywords: setuptools deployment installation distutils
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Requires-Python: >=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*
+Provides-Extra: docs
+Requires-Dist: sphinx (<2,>=1.8.0); extra == 'docs'
+Provides-Extra: testing
+Requires-Dist: pytest (<4,>=3.0.0); extra == 'testing'
+Requires-Dist: coverage (<5,>=4.5.0); extra == 'testing'
+Requires-Dist: pytest-timeout (<2,>=1.3.0); (platform_python_implementation != "Jython") and extra == 'testing'
+Requires-Dist: mock; (python_version < "3.3") and extra == 'testing'
+
+Virtualenv
+==========
+
+`Mailing list <http://groups.google.com/group/python-virtualenv>`_ |
+`Issues <https://github.com/pypa/virtualenv/issues>`_ |
+`Github <https://github.com/pypa/virtualenv>`_ |
+`PyPI <https://pypi.org/project/virtualenv/>`_ |
+User IRC: #pypa
+Dev IRC: #pypa-dev
+
+Introduction
+------------
+
+``virtualenv`` is a tool to create isolated Python environments.
+
+The basic problem being addressed is one of dependencies and versions,
+and indirectly permissions. Imagine you have an application that
+needs version 1 of LibFoo, but another application requires version
+2. How can you use both these applications?  If you install
+everything into ``/usr/lib/python2.7/site-packages`` (or whatever your
+platform's standard location is), it's easy to end up in a situation
+where you unintentionally upgrade an application that shouldn't be
+upgraded.
+
+Or more generally, what if you want to install an application *and
+leave it be*?  If an application works, any change in its libraries or
+the versions of those libraries can break the application.
+
+Also, what if you can't install packages into the global
+``site-packages`` directory?  For instance, on a shared host.
+
+In all these cases, ``virtualenv`` can help you. It creates an
+environment that has its own installation directories, that doesn't
+share libraries with other virtualenv environments (and optionally
+doesn't access the globally installed libraries either).
+
+.. comment: 
+
+Release History
+===============
+
+
+16.1.0 (2018-10-31)
+-------------------
+* Fixed documentation to use pypi.org and correct curl options; #1042
+* bug fix: ensure prefix is absolute when creating a new virtual environment #1208
+* upgrade setuptools from ``39.1.0`` to ``40.5.0``
+* upgrade wheel from ``0.31.1`` to ``0.32.2``
+* upgrade pip from ``10.0.1`` to ``18.1``
+* ``activate.csh`` does not use basename and handles newlines #1200
+* fix failure to copy on platforms that use lib64 #1189
+* enable tab-completion in the interactive interpreter by default, thanks to a new ``sys.__interactivehook__`` on Python 3 #967
+* suppress warning of usage of the deprecated ``imp`` module #1238
+
+16.0.0 (2018-05-16)
+-------------------
+
+* Drop support for Python 2.6.
+* Upgrade pip to 10.0.1.
+* Upgrade setuptools to 39.1.0.
+* Upgrade wheel to 0.31.1.
+
+
+`Full Changelog <https://virtualenv.pypa.io/en/latest/changes.html>`_.
+
