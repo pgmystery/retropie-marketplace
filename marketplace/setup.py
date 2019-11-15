@@ -84,9 +84,16 @@ if not skip_es_systems:
 
 	es_systems.write(open(path + "es_systems_NEW.cfg", "w"), encoding='utf8')
 
-	copy_es_systems = Popen(path + "setup_helper.sh " + path + "es_systems_NEW.cfg " + es_systems_path, stdin=PIPE, stdout=PIPE, shell=True)  # THIS NEEDS ADMIN-RIGHTS!!!!
+	copy_es_systems = Popen("sudo sh " + path + "setup_helper.sh " + path + "es_systems_NEW.cfg " + es_systems_path, stdin=PIPE, stdout=PIPE, shell=True)  # THIS NEEDS ADMIN-RIGHTS!!!!
 
 	copy_es_systems.wait()
+
+	set_rights_to_files1 = Popen('find ' + retropie_dir + 'marketplace/ -type f -iname "*.sh" -exec chmod +x {} \\;', stdin=PIPE, stdout=PIPE, shell=True)	
+	set_rights_to_files1.wait()
+	set_rights_to_files2 = Popen('find ' + retropie_dir + 'marketplace/ -type f -iname "*.py" -exec chmod +x {} \\;', stdin=PIPE, stdout=PIPE, shell=True)
+	set_rights_to_files2.wait()
+	set_rights_to_files3 = Popen('find ' + retropie_dir + 'marketplace/ -type f -iname "python" -exec chmod +x {} \\;', stdin=PIPE, stdout=PIPE, shell=True)
+	set_rights_to_files3.wait()
 
 shutil.rmtree(path)
 

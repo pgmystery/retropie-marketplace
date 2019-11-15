@@ -130,6 +130,12 @@ fi
 
 GAMES=()
 
+if (( $(grep -c . <<<"$GAMESLIST") == 0 )); then
+	source $BASEDIR/dialog/msgbox.sh "ERROR", "No Games found!\nMaybe an error with the host or with your internet connection"
+	clear
+	exit
+fi
+
 while read -r line; do
     GAMES+=("$line" "" off)
 done <<< "$GAMESLIST"
