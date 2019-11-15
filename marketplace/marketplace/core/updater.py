@@ -20,13 +20,14 @@ marketplace_url = "https://github.com/pgmystery/retropie-marketplace/archive/mas
 try:
 	response = urllib2.urlopen(update_url)
 except:
-	# print("ERROR")
+	msgbox = Popen(["/" + path + "../dialog/msgbox.sh", "Couldn't get version", "ERROR on getting the version!\nMaybe check your internet connection"])
+	msgbox.wait()
 	exit()
 
 newest_version = response.read().replace("\n", "")
 
 with open(path + "/../VERSION", "r") as f:
-	current_version = f.read()
+	current_version = f.read().replace("\n", "")
 
 if newest_version == current_version:
 	msgbox = Popen(["/" + path + "../dialog/msgbox.sh", "Update", "You're using the latest version of the RetroPie-Marketplace!"])
