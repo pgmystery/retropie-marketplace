@@ -18,11 +18,11 @@ def get_hosts(args):
 	hosts_list = ""
 
 	for f in listdir(hosts_dir):
-		if isfile(join(hosts_dir, f)) and f.endswith(".py") and f != "__init__.py":
+		if isfile(join(hosts_dir, f)) and f.endswith(".py") and f != "__init__.py" and f != "Host.py":
 			host = splitext(f)[0]
 			if em_system:
 				host_module = importlib.import_module(host)
-				host_systems = host_module.get_supported_emulators()
+				host_systems = host_module.emulators.keys()
 				if em_system in host_systems:
 					hosts_list += host + "\n"
 			else:

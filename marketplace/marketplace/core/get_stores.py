@@ -9,7 +9,7 @@ from get_hosts import get_hosts
 path = get_path()
 
 with open(path + "/../" + "systems.json") as f:
-     systems = json.load(f)
+	systems = json.load(f)
 
 
 def get_stores(args):
@@ -22,7 +22,7 @@ def get_stores(args):
 	stores = []
 	for host in hosts:
 		host_module = importlib.import_module(host)
-		host_stores = host_module.get_supported_emulators()
+		host_stores = host_module.emulators.keys()
 		for store in host_stores:
 			if store in systems.keys():
 				if systems[store] not in stores:
