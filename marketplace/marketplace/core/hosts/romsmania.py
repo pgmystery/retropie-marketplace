@@ -1,8 +1,6 @@
 import sys
-from os import path
-import urllib2
-import requests
 from lxml import etree
+from Host import Host
 
 
 emulators = {
@@ -30,112 +28,49 @@ emulators = {
 }
 
 
-def get_supported_emulators(*args, **kwargs):
-	# try:
-	# 	emulator = args[0][1]
-	# except IndexError:
-	# 	return "ERROR"
+class ROMsMania(Host):
+	def __init__(self):
+		super(ROMsMania, self).__init__(emulators)
 
-	# if emulator in emulators.keys():
-	# 	return "true"
-	# else:
-	# 	return "false"
-	return emulators.keys()
+	def run(self, sys_argv, host=None):
+		return super(ROMsMania, self).run(sys_argv, self)
 
+	def get_games(self, *args):
+		emulator = self.get_emulator(args[0][1])
+		page = 1
+		while True:
+			gamelist_url = "https://romsmania.cc/roms/%s/search?name=&genre=&region=&orderBy=name&orderAsc=1&page=%s" % (emulator, str(page))
+			html = self.get_html(gamelist_url)
+			gamelist_object = html.xpath("./body/table/tbody//tr")
+			if len(gamelist_object) == 0:
+				break
+			for tr in gamelist_object:
+				tr_a = tr.xpath("./td[1]/a")[0]
+				gametext = etree.tostring(tr_a, method="text", encoding="UTF-8")
+				for line in gametext.splitlines():
+					if not line.isspace() and len(line) > 0:
+						self.add_game(line)
+			page += 1
+		return self.get_gameslist()
 
-def get_games(*args, **kwargs):
-	try:
-		emulator = args[0][1]
-	except IndexError:
-		return "ERROR"
-
-	if not emulator in emulators.keys():
-		return "ERROR"
-	emulator = emulators[emulator]
-
-	page = 1
-
-	header = {
-		'User-Agent': '',
-	}
-
-	gamelist = ""
-
-	while True:
-		gamelist_url = "https://romsmania.cc/roms/%s/search?name=&genre=&region=&orderBy=name&orderAsc=1&page=%s" % (emulator, str(page))
-		req = urllib2.Request(gamelist_url, headers=header)
-		response = urllib2.urlopen(req)
-		html = etree.HTML(response.read())
-		gamelist_object = html.xpath("./body/table/tbody//tr")
-		if len(gamelist_object) == 0:
-			break
-		for tr in gamelist_object:
-			tr_a = tr.xpath("./td[1]/a")[0]
-			gametext = etree.tostring(tr_a, method="text", encoding="UTF-8")
-			for line in gametext.splitlines():
-				if not line.isspace() and len(line) > 0:
-					gamelist += line + "\n"
-		page += 1
-	gamelist = gamelist[:-1]
-
-	return gamelist
-
-
-def get_game_download_link(*args, **kwargs):
-	try:
-		emulator = args[0][1]
-		game_to_install = args[0][2]
-	except IndexError:
-		return "ERROR"
-
-	if not emulator in emulators.keys():
-		return "ERROR"
-	emulator = emulators[emulator]
-
-	# Delete illegal chars:
-	illegal_chars = [
-		"\\",
-	]
-	for char in illegal_chars:
-		game_to_install = game_to_install.replace(char, "")
-
-	url = "https://romsmania.cc/roms/%s/search?name=%s&genre=&region=&orderBy=name&orderAsc=1&page=1" % (emulator, game_to_install)
-
-	header = {
-		'User-Agent': '',
-	}
-
-	req = urllib2.Request(url, headers=header)
-	response = urllib2.urlopen(req)
-
-	html = etree.HTML(response.read())
-	gamelink_object = html.xpath("./body/table/tbody/tr/td/a")[0]
-	gamelink = gamelink_object.attrib['href']
-
-	gamelink_name = gamelink.split("/")
-	gamelink_name = gamelink_name[len(gamelink_name) - 1]
-
-	game_downloadlink = "https://romsmania.cc/download/roms/%s/%s" % (emulator, gamelink_name)
-
-	req = urllib2.Request(game_downloadlink, headers=header)
-	response = urllib2.urlopen(req)
-	
-	html = etree.HTML(response.read())
-	downloadlink_object = html.xpath("./body/div[@class='out']/div[@class='wait']/p[@class='wait__text']/a")[0]
-
-	gamedownloadURL = downloadlink_object.attrib["href"]
-
-	return gamedownloadURL
+	def get_game_download_link(self, *args):
+		emulator = self.get_emulator(args[0][1])
+		game_to_install = self.validate_game_to_install(args[0][2])
+		url = "https://romsmania.cc/roms/%s/search?name=%s&genre=&region=&orderBy=name&orderAsc=1&page=1" % (emulator, game_to_install)
+		html = self.get_html(url)
+		gamelink_object = html.xpath("./body/table/tbody/tr/td/a")[0]
+		gamelink = gamelink_object.attrib['href']
+		gamelink_name = gamelink.split("/")
+		gamelink_name = gamelink_name[len(gamelink_name) - 1]
+		game_downloadlink = "https://romsmania.cc/download/roms/%s/%s" % (emulator, gamelink_name)
+		html = self.get_html(game_downloadlink)
+		downloadlink_object = html.xpath("./body/div[@class='out']/center/div[@class='wait']/p[@class='wait__text']/a")[0]
+		gamedownloadURL = downloadlink_object.attrib["href"]
+		return gamedownloadURL
 
 
 if __name__ == "__main__":
 	try:
-		run = sys.argv[1]
-		if run == "get_games":
-			print(get_games(sys.argv[1:len(sys.argv)]))
-		elif run == "get_game_download_link":
-			print(get_game_download_link(sys.argv[1:len(sys.argv)]))
-		else:
-			print("ERROR")
-	except IndexError:
+		print(ROMsMania().run(sys.argv))
+	except:
 		print("ERROR")

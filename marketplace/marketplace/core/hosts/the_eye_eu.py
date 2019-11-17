@@ -1,8 +1,5 @@
 import sys
-from os import path
-import urllib2
-import requests
-from lxml import etree
+from Host import Host
 
 
 emulators = {
@@ -31,98 +28,41 @@ emulators_link = {
 }
 
 
-def get_supported_emulators(*args, **kwargs):
-	# try:
-	# 	emulator = args[0][1]
-	# except IndexError:
-	# 	return "ERROR"
+class TheEyeEu(Host):
+	def __init__(self):
+		super(TheEyeEu, self).__init__(emulators, emulators_link)
 
-	# if emulator in emulators.keys():
-	# 	return "true"
-	# else:
-	# 	return "false"
-	return emulators.keys()
+	def run(self, sys_argv, host=None):
+		return super(TheEyeEu, self).run(sys_argv, self)
 
+	def get_games(self, *args):
+		emulator_origin = args[0][1]
+		emulator = self.get_emulator(emulator_origin)
+		emulator_link = self.get_emulator_link(emulator_origin)
+		gamelist_url = "https://the-eye.eu/public/rom/%s/%s/" % (emulator, emulator_link)
+		html = self.get_html(gamelist_url)
+		gamelist_object = html.xpath("./body/div[1]/div/div[@class='ui left aligned stacked segment']/pre//a")
+		gamelist_object.pop(0)
+		gamelist_object.pop(len(gamelist_object) - 1)
+		for game in gamelist_object:
+			if game.text:
+				self.add_game(game.text)
+		return self.get_gameslist()
 
-def get_games(*args, **kwargs):
-	try:
-		emulator = args[0][1]
-	except IndexError:
-		return "ERROR"
-	emulator_link = ""
-	if emulator in emulators_link:
-		emulator_link = emulators_link[emulator]
-	emulator = emulators[emulator]
-
-	header = {
-		'User-Agent': '',
-	}
-
-	gamelist = ""
-	gamelist_url = "https://the-eye.eu/public/rom/%s/%s/" % (emulator, emulator_link)
-	req = urllib2.Request(gamelist_url, headers=header)
-	response = urllib2.urlopen(req)
-	html = etree.HTML(response.read())
-	gamelist_object = html.xpath("./body/div[1]/div/div[@class='ui left aligned stacked segment']/pre//a")
-	gamelist_object.pop(0)
-	gamelist_object.pop(len(gamelist_object) - 1)
-	for game in gamelist_object:
-		if game.text:
-			gamelist += game.text + "\n"
-	gamelist = gamelist[:-1]
-
-	return gamelist
-
-
-def get_game_download_link(*args, **kwargs):
-	try:
-		emulator = args[0][1]
-		game_to_install = args[0][2]
-	except IndexError:
-		return "ERROR"
-
-	if not emulator in emulators.keys():
-		return "ERROR"
-
-	# Delete illegal chars:
-	illegal_chars = [
-		"\\",
-	]
-	for char in illegal_chars:
-		game_to_install = game_to_install.replace(char, "")
-
-	emulator_link = ""
-	if emulator in emulators_link:
-		emulator_link = emulators_link[emulator]
-	emulator = emulators[emulator]
-
-	header = {
-		'User-Agent': '',
-	}
-
-	gamedownloadURL = ""
-
-	url = "https://the-eye.eu/public/rom/%s/%s" % (emulator, emulator_link)
-
-	req = urllib2.Request(url, headers=header)
-	response = urllib2.urlopen(req)
-	html = etree.HTML(response.read())
-
-	downloadlink_object = html.xpath('.//a[text()="%s"]' % game_to_install)[0]
-
-	gamedownloadURL = url + downloadlink_object.attrib["href"]
-
-	return gamedownloadURL
+	def get_game_download_link(self, *args):
+		emulator_origin = args[0][1]
+		emulator = self.get_emulator(emulator_origin)
+		emulator_link = self.get_emulator_link(emulator_origin)
+		game_to_install = self.validate_game_to_install(args[0][2])
+		url = "https://the-eye.eu/public/rom/%s/%s" % (emulator, emulator_link)
+		html = self.get_html(url)
+		downloadlink_object = html.xpath('.//a[text()="%s"]' % game_to_install)[0]
+		gamedownloadURL = url + downloadlink_object.attrib["href"]
+		return gamedownloadURL
 
 
 if __name__ == "__main__":
 	try:
-		run = sys.argv[1]
-		if run == "get_games":
-			print(get_games(sys.argv[1:len(sys.argv)]))
-		elif run == "get_game_download_link":
-			print(get_game_download_link(sys.argv[1:len(sys.argv)]))
-		else:
-			print("ERROR")
-	except IndexError:
+		print(TheEyeEu().run(sys.argv))
+	except:
 		print("ERROR")
