@@ -1,3 +1,4 @@
 lxml == 4.2.6
 requests
 urllib3
+pyecm2cue
