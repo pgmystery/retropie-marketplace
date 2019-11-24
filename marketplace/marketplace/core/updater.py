@@ -72,8 +72,8 @@ else:
 
 			update_path = "/tmp/"
 
-			if os.path.isdir(update_path + "marketplace"):
-				shutil.rmtree(update_path + "marketplace")
+			if os.path.isdir(update_path + "retropie-marketplace-master"):
+				shutil.rmtree(update_path + "retropie-marketplace-master")
 
 			dialog_title = "Extracting Update..."
 			dialog_description = "Extracting Update...\nPlease wait!"
