@@ -1,14 +1,13 @@
 import os
 import sys
-import signal
 import shutil
 import urllib
-import urllib2
 from urlparse import urlsplit
 import re
 from subprocess import Popen, PIPE
 import requests
 from lxml import etree
+from importlib import import_module
 
 from get_path import get_path
 
@@ -29,6 +28,11 @@ try:
 except IndexError:
 	print("ERROR")
 
+install_extension = None
+install_extension_path = path + "/install_extensions/"
+sys.path.append(install_extension_path)
+if os.path.isfile(install_extension_path + store + ".py"):
+	install_extension = import_module(store)
 
 h = requests.head(game_downloadlink, allow_redirects=True)
 header = h.headers
@@ -41,7 +45,7 @@ else:
 	request_type = "get"
 
 if not os.path.exists(path + "../tmp/"):
-    os.makedirs(path + "../tmp/")
+	os.makedirs(path + "../tmp/")
 
 total_size = 100
 
@@ -50,20 +54,15 @@ infoscreen = Popen(["/" + path + "../dialog/info.sh", "Downloading Game...", "St
 if request_type == "post":
 	session = requests.Session()
 	response = session.get(game_downloadlink)
-
 	r = requests.post(game_downloadlink, cookies=session.cookies.get_dict(), stream=True)
-
-	if "content-disposition" in r.headers:
-		fname = re.findall("filename=(.+)", r.headers['content-disposition'])[0].replace("\"", "")
-	else:
-		fname = os.path.basename(urlsplit(r.url)[2])
-		fname = urllib.unquote(fname).decode('utf8')
 elif request_type == "get":
 	r = requests.get(game_downloadlink, stream=True)
 
+if "content-disposition" in r.headers:
+	fname = re.findall("filename=(.+)", r.headers['content-disposition'])[0].replace("\"", "")
+else:
 	fname = os.path.basename(urlsplit(r.url)[2])
 	fname = urllib.unquote(fname).decode('utf8')
-
 
 total_size = int(r.headers.get('content-length', 0))
 
@@ -104,11 +103,8 @@ extensions_object = system.xpath("./extension")[0]
 allowed_extensions = etree.tostring(extensions_object, method="text", encoding="UTF-8").replace("\n", "").split(" ")
 allowed_extensions = filter(lambda extension: extension != "", allowed_extensions)
 
-if store == "psx":
-	allowed_extensions.append(".bin")
-	allowed_extensions.append(".BIN")
-	allowed_extensions.append(".ecm")
-	allowed_extensions.append(".ECM")
+if install_extension:
+	allowed_extensions = install_extension.load_extension(allowed_extensions)
 
 
 extract_files = []
@@ -138,26 +134,14 @@ else:
 		if filepath.endswith(extension):
 			shutil.move(filepath, rom_path)
 
-# PSX-BIN:
-if store == "psx":
-	psx_bin_file = None
-	for file in extract_files:
-		if file.lower().endswith(".bin"):
-			psx_bin_file = file
-			break
-	if psx_bin_file:
-		if not os.path.isfile(rom_path + psx_bin_file[:len(psx_bin_file) - len(".bin")] + ".cue") and not os.path.isfile(rom_path + psx_bin_file[:len(psx_bin_file) - len(".bin")] + ".CUE"):
-			yesno = Popen(["/" + path + "../dialog/yesno.sh", "Rename \".bin\"-file", "On the game: \"" + game_to_install + "\"\nThe downloaded ROM file has a \".bin\"-file without an \".cue\"-file. RetroPie don't support this! Do you want to rename the \".bin\"-file to \".iso\" and try that this will work?\nOn no, the \".bin\"-file will be deleted!", "true"], stdout=PIPE)
-			yesno.wait()
-			out, err = yesno.communicate()
-			if out:
-				if out.find("0") > -1:
-					os.rename(rom_path + "/" + psx_bin_file, rom_path + "/" + psx_bin_file[:len(psx_bin_file) - len(".bin")] + ".iso")
-				else:
-					os.remove(rom_path + "/" + psx_bin_file)
-			else:
-				os.remove(rom_path + "/" + psx_bin_file)
-			infoscreen = Popen(["/" + path + "../dialog/info.sh", "Install Game...", "Installing Game \"" + game_to_install + "\"\nPlease wait..."])
+if install_extension:
+	data = {
+		"path": path,
+		"rom_path": rom_path,
+		"game_to_install": game_to_install,
+		"extract_files": extract_files,
+	}
+	install_extension.after_install(data)
 
 if os.path.exists(filepath):
 	os.remove(filepath)
