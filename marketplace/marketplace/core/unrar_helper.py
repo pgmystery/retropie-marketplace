@@ -20,7 +20,7 @@ path = get_path()
 
 def get_files(archive):
 	files = []
-	archive_file = Popen([path + unrar_file, "lb", archive], stdout=PIPE)
+	archive_file = Popen([path + "/tools/" + unrar_file, "lb", archive], stdout=PIPE)
 	archive_file.wait()
 	out, err = archive_file.communicate()
 	if out:
@@ -33,7 +33,7 @@ def get_files(archive):
 
 
 def extract_files(archive, files_to_extract, path_to_extract):
-	cmd = [path + unrar_file, "x", "-y", archive]
+	cmd = [path + "/tools/" +  unrar_file, "x", "-y", archive]
 	tmp_dir = path + "/../tmp/"
 	files = []
 	if type(files_to_extract) == str:
@@ -46,7 +46,7 @@ def extract_files(archive, files_to_extract, path_to_extract):
 	else:
 		return False
 	cmd.append(tmp_dir)
-	# TODO: If the file already is in the outoup folder, ask the user to overrite it or not!!!
+	# TODO: If the file already is in the output folder, ask the user to override it or not!!!
 	archive_file = Popen(cmd, stdout=PIPE)
 	archive_file.wait()
 	for file in files:
