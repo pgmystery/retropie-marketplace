@@ -40,7 +40,7 @@ start_joy2key
 if [[ "$STORE" == *"search for updates"* ]]; then
 	source $BASEDIR/dialog/info.sh "Searching for Updates" "Searching for Updates!\nPlease wait..."
 	$python_venv $BASEDIR/core/updater.py
-	if [ -e "/tmp/retropie-marketplace-master/marketplace/setup.py" ]; then
+	if [[ -f "/tmp/retropie-marketplace-master/marketplace/setup.py" ]]; then
 		source $BASEDIR/dialog/info.sh "Updating Marketplace" "Updating Marketplace!\nAfter updating, the emulationstation will be restarted!\nPlease wait..."
 		$python_venv "/tmp/retropie-marketplace-master/marketplace/setup.py"
 		touch /tmp/es-restart
