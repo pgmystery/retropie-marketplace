@@ -94,6 +94,8 @@ if not skip_es_systems:
 	set_rights_to_files2.wait()
 	set_rights_to_files3 = Popen('find ' + retropie_dir + 'marketplace/ -type f -iname "python" -exec chmod +x {} \\;', stdin=PIPE, stdout=PIPE, shell=True)
 	set_rights_to_files3.wait()
+	set_rights_to_files4 = Popen('chmod +x ' + retropie_dir + 'marketplace/core/tools/*', stdin=PIPE, stdout=PIPE, shell=True)
+	set_rights_to_files4.wait()
 
 shutil.rmtree(path)
 
