@@ -1,5 +1,4 @@
 import os
-import sys
 import urllib2
 from subprocess import Popen, PIPE
 import re
@@ -52,7 +51,10 @@ else:
 					if chunk:
 						current_size += len(chunk)
 						f.write(chunk)
-						progress = int((float(current_size) / float(total_size)) * 100.0)
+						if current_size > 0 and total_size > 0:
+							progress = int((float(current_size) / float(total_size)) * 100.0)
+						else :
+							progress = 0
 						if current_progress < progress:
 							current_progress = progress
 							process.stdin.write(str(progress) + '\n')
