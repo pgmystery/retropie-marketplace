@@ -35,10 +35,6 @@ out, err = update_system.communicate()
 print(out)
 
 
-# INSTALL PACKAGES:
-from packages import install_packages
-install_packages()
-
 # INSTALL VENV:
 from venv.install_venv import install_venv
 if not install_venv(path + "/marketplace/core/venv/"):
@@ -88,14 +84,14 @@ if not skip_es_systems:
 
 	copy_es_systems.wait()
 
-	set_rights_to_files1 = Popen('find ' + retropie_dir + 'marketplace/ -type f -iname "*.sh" -exec chmod +x {} \\;', stdin=PIPE, stdout=PIPE, shell=True)	
-	set_rights_to_files1.wait()
-	set_rights_to_files2 = Popen('find ' + retropie_dir + 'marketplace/ -type f -iname "*.py" -exec chmod +x {} \\;', stdin=PIPE, stdout=PIPE, shell=True)
-	set_rights_to_files2.wait()
-	set_rights_to_files3 = Popen('find ' + retropie_dir + 'marketplace/ -type f -iname "python" -exec chmod +x {} \\;', stdin=PIPE, stdout=PIPE, shell=True)
-	set_rights_to_files3.wait()
-	set_rights_to_files4 = Popen('chmod +x ' + retropie_dir + 'marketplace/core/tools/*', stdin=PIPE, stdout=PIPE, shell=True)
-	set_rights_to_files4.wait()
+set_rights_to_files1 = Popen('find ' + retropie_dir + 'marketplace/ -type f -iname "*.sh" -exec chmod +x {} \\;', stdin=PIPE, stdout=PIPE, shell=True)	
+set_rights_to_files1.wait()
+set_rights_to_files2 = Popen('find ' + retropie_dir + 'marketplace/ -type f -iname "*.py" -exec chmod +x {} \\;', stdin=PIPE, stdout=PIPE, shell=True)
+set_rights_to_files2.wait()
+set_rights_to_files3 = Popen('find ' + retropie_dir + 'marketplace/ -type f -iname "python" -exec chmod +x {} \\;', stdin=PIPE, stdout=PIPE, shell=True)
+set_rights_to_files3.wait()
+set_rights_to_files4 = Popen('chmod +x ' + retropie_dir + 'marketplace/core/tools/*', stdin=PIPE, stdout=PIPE, shell=True)
+set_rights_to_files4.wait()
 
 shutil.rmtree(path)
 
