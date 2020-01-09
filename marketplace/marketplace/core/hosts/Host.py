@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import urllib2
-from lxml import etree
 import json
+
+import etree
 
 
 class Host(object):
@@ -40,18 +41,18 @@ class Host(object):
 
 	def get_emulator(self, emulator):
 		if emulator not in self.emulators.keys():
-			return "ERROR"
+			return ""
 		emulator = self.emulators[emulator]
 		return emulator
 
 	def get_emulator_link(self, emulator):
 		if emulator not in self.emulators_link:
-			return "ERROR"
+			return ""
 		emulator_link = self.emulators_link[emulator]
 		return emulator_link
 
 	def get_html(self, url):
-		return etree.HTML(self.request(url).read())
+		return etree.parse(self.request(url).read())
 
 	def get_json(self, url):
 		return json.load(self.request(url))
