@@ -54,7 +54,7 @@ fi
 # INFO
 if [ "$STORE" == "info" ]; then
 	VERSION=`$python_venv $BASEDIR/core/get_version.py`
-	source $BASEDIR/dialog/msgbox.sh "About Emulationstation-Marketplace", "Emulationstation-Marketplace version: v$VERSION\nCreated by Philipp Glaw"
+	source $BASEDIR/dialog/msgbox.sh "About RetroPie-Marketplace", "RetroPie-Marketplace version: v$VERSION\nCreated by Philipp Glaw\nGithub: https://github.com/pgmystery/retropie-marketplace"
 	clear
 	exit
 fi
@@ -155,7 +155,13 @@ GAMECHOICES=$(eval 'for word in '$CHOICE'; do echo $word; done')
 while read -r line; do
 	source $BASEDIR/dialog/info.sh "Getting Downloadfile..." "Getting DownloadFile for:\n\"$line\"\nPlease wait..."
 	GAMELINK=`$python_venv $BASEDIR/core/hosts/$LIST_CHOICE.py "get_game_download_link" "$EM_SYSTEM" "$line"`
-	$python_venv $BASEDIR/core/install_game.py "$EM_SYSTEM" "$line" "$GAMELINK"
+	if [ "$GAMELINK" == "ERROR" ]; then
+		source $BASEDIR/dialog/msgbox.sh "Couldn't download the game", "ERROR on downloading the game :(\nTry to download this game from another host."
+		clear
+		exit
+  else
+		$python_venv $BASEDIR/core/install_game.py "$EM_SYSTEM" "$line" "$GAMELINK"
+  fi
 done <<< "$GAMECHOICES"
 
 
