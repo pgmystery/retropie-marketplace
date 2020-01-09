@@ -41,7 +41,7 @@ class TheEyeEu(Host):
 		emulator_link = self.get_emulator_link(emulator_origin)
 		gamelist_url = "https://the-eye.eu/public/rom/%s/%s/" % (emulator, emulator_link)
 		html = self.get_html(gamelist_url)
-		gamelist_object = html.xpath("./body/div[1]/div/div[@class='ui left aligned stacked segment']/pre//a")
+		gamelist_object = html.findall("./body/div[1]/div/div[@class='ui left aligned stacked segment']/pre//a")
 		gamelist_object.pop(0)
 		gamelist_object.pop(len(gamelist_object) - 1)
 		for game in gamelist_object:
@@ -56,8 +56,12 @@ class TheEyeEu(Host):
 		game_to_install = self.validate_game_to_install(args[0][2])
 		url = "https://the-eye.eu/public/rom/%s/%s" % (emulator, emulator_link)
 		html = self.get_html(url)
-		downloadlink_object = html.xpath('.//a[text()="%s"]' % game_to_install)[0]
-		gamedownloadURL = url + downloadlink_object.attrib["href"]
+		links = html.findall(".//a")
+		gamedownloadURL = None
+		for link in links:
+			if link.text == game_to_install:
+				gamedownloadURL = url + link.attrib["href"]
+				break
 		return gamedownloadURL
 
 

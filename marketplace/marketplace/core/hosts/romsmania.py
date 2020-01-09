@@ -1,6 +1,7 @@
 import sys
-from lxml import etree
+import urllib
 from Host import Host
+import etree
 
 
 emulators = {
@@ -41,12 +42,12 @@ class ROMsMania(Host):
 		while True:
 			gamelist_url = "https://romsmania.cc/roms/%s/search?name=&genre=&region=&orderBy=name&orderAsc=1&page=%s" % (emulator, str(page))
 			html = self.get_html(gamelist_url)
-			gamelist_object = html.xpath("./body/table/tbody//tr")
+			gamelist_object = html.findall("./body/table/tbody//tr")
 			if len(gamelist_object) == 0:
 				break
 			for tr in gamelist_object:
-				tr_a = tr.xpath("./td[1]/a")[0]
-				gametext = etree.tostring(tr_a, method="text", encoding="UTF-8")
+				tr_a = tr.find("./td[1]/a")
+				gametext = etree.tostring(tr_a)
 				for line in gametext.splitlines():
 					if not line.isspace() and len(line) > 0:
 						self.add_game(line)
@@ -56,15 +57,16 @@ class ROMsMania(Host):
 	def get_game_download_link(self, *args):
 		emulator = self.get_emulator(args[0][1])
 		game_to_install = self.validate_game_to_install(args[0][2])
+		game_to_install = urllib.quote(game_to_install)
 		url = "https://romsmania.cc/roms/%s/search?name=%s&genre=&region=&orderBy=name&orderAsc=1&page=1" % (emulator, game_to_install)
 		html = self.get_html(url)
-		gamelink_object = html.xpath("./body/table/tbody/tr/td/a")[0]
+		gamelink_object = html.find("./body/table/tbody/tr/td/a")
 		gamelink = gamelink_object.attrib['href']
 		gamelink_name = gamelink.split("/")
 		gamelink_name = gamelink_name[len(gamelink_name) - 1]
 		game_downloadlink = "https://romsmania.cc/download/roms/%s/%s" % (emulator, gamelink_name)
 		html = self.get_html(game_downloadlink)
-		downloadlink_object = html.xpath("./body/div[@class='out']/center/div[@class='wait']/p[@class='wait__text']/a")[0]
+		downloadlink_object = html.find("./body/div[@class='out']/center/div[@class='wait']/p[@class='wait__text']/a")
 		gamedownloadURL = downloadlink_object.attrib["href"]
 		return gamedownloadURL
 
