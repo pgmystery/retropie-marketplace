@@ -29,7 +29,7 @@ def get_hosts(args):
 				hosts_list += host + "\n"
 
 	if len(hosts_list) > 0:
-		return hosts_list.rsplit("\n",1)[0]
+		return hosts_list.rsplit("\n", 1)[0]
 	else:
 		return "false"
 
