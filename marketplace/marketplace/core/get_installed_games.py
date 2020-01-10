@@ -1,4 +1,3 @@
-import os
 import sys
 import ntpath
 
@@ -10,4 +9,3 @@ except IndexError:
 	print("ERROR")
 
 rom_path = main_rom_path + "/" + store + "/"
-
