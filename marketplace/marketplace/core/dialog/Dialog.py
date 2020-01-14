@@ -7,6 +7,8 @@ from get_path import get_path
 class Dialog(object):
 	def __init__(self):
 		self.path = get_path()
+		self.stdout = PIPE
+		self.stdin = PIPE
 
 	def _create_dialog(self, dialog_type, title, msg, *args):
 		self.dialog_type = dialog_type
@@ -14,4 +16,4 @@ class Dialog(object):
 		self.msg = msg
 		cmd = ["/%s../dialog/%s.sh" % (self.path, dialog_type), title, msg]
 		cmd.extend(args)
-		return Popen(cmd, stdin=PIPE)
+		return Popen(cmd, stdin=self.stdin, stdout=self.stdout)
