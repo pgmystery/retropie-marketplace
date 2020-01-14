@@ -38,17 +38,34 @@ else:
 	if yesNoDialog.answer:
 		r = requests.get(marketplace_url, stream=True)
 		fname = re.findall("filename=(.+)", r.headers['content-disposition'])[0].replace("\"", "")
-		total_size = int(r.headers.get('content-length', 0))
+		total_size = 0
+		if "content-length" in r.headers:
+			total_size = int(r.headers["content-length"])
+		else:
+			if "x-varnish" in r.headers:
+				if r.headers["x-varnish"].isdigit():
+					total_size = int(r.headers["x-varnish"])
+
 		dialog_title = "Downloading UPDATE..."
-		dialog_description = "Downloading RetroPie-Marketplace v%s\nNeed to downloading %s Bytes\nPlease wait..." % (newest_version, str("{:,}".format(total_size)))
-		download_dialog = GaugeDialog(dialog_title, dialog_description, max_value=total_size)
+
+		download_dialog = None
+		if total_size > 0:
+			dialog_description = "Downloading RetroPie-Marketplace v%s\nNeed to downloading %s Bytes\nPlease wait..." % (newest_version, str("{:,}".format(total_size)))
+			download_dialog = GaugeDialog(dialog_title, dialog_description, max_value=total_size)
+		else:
+			InfoDialog(dialog_title, "Downloading RetroPie-Marketplace v%s\nPlease wait..." % newest_version)
+
 		with open("/tmp/" + fname, 'wb') as f:
 			current_size = 0
 			for chunk in r.iter_content(chunk_size=1024):
 				if chunk:
 					current_size += len(chunk)
 					f.write(chunk)
-					download_dialog.set_progress(current_size)
+					if download_dialog:
+						download_dialog.set_progress(current_size)
+
+		if download_dialog:
+			download_dialog.close()
 
 		InfoDialog("Install Update...", "Installing RetroPie-Marketplace v" + newest_version + "\nPlease wait...")
 
@@ -90,5 +107,7 @@ else:
 				o.write(b)
 			i.close()
 			o.close()
+
+		extracting_dialog.close()
 
 		os.remove("/tmp/" + fname)
