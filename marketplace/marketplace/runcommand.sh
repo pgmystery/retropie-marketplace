@@ -41,7 +41,8 @@ search_for_update() {
 	$python_venv $BASEDIR/core/updater.py
 	if [[ -f "/tmp/retropie-marketplace-master/marketplace/setup.py" ]]; then
 		source $BASEDIR/dialog/info.sh "Updating Marketplace" "Updating Marketplace!\nAfter updating, the emulationstation will be restarted!\nPlease wait..."
-		$python_venv "/tmp/retropie-marketplace-master/marketplace/setup.py"
+		$python_venv -u "/tmp/retropie-marketplace-master/marketplace/setup.py" | source $BASEDIR/dialog/progressbox.sh "Install Update" "Installing new Update, please wait..."
+		clear
 		touch /tmp/es-restart
 		pkill -f -e "/opt/retropie/supplementary/.*/emulationstation$"
 	fi
