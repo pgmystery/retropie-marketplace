@@ -1,4 +1,4 @@
-# RetroPie Marketplace Framework
+# RetroPie Marketplace
 
 ⚠️ **Legal Disclaimer**
 
@@ -11,6 +11,12 @@ Users are responsible for ensuring that all content downloaded or installed usin
 - Personal backups of games you own (where legally permitted)
 
 This project **does not condone or facilitate piracy** in any form.
+
+---
+
+## Description
+
+This project is an addon for RetroPie that enables users to download and install ROMs directly onto their system. It simplifies the process by automating the setup through a Python script and uses GUI for easy usage.
 
 ---
 
